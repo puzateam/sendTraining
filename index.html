@@ -66,6 +66,11 @@
             background-color: #FEF3C7; /* Light yellow hover */
             color: #D97706;
         }
+        .chart-container { /* <<< CSS ใหม่สำหรับ container ของกราฟ */
+            position: relative; 
+            height: 250px;  /* คุณสามารถปรับความสูงนี้ได้ */
+            width: 100%;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -97,11 +102,15 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (จำนวน)</h3>
-                    <canvas id="statusBarChart"></canvas>
+                    <div class="chart-container"> {/* <<< HTML ที่ปรับปรุง */}
+                        <canvas id="statusBarChart"></canvas>
+                    </div>
                 </div>
                 <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (อัตราส่วน)</h3>
-                    <canvas id="statusPieChart"></canvas>
+                    <div class="chart-container"> {/* <<< HTML ที่ปรับปรุง */}
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
                 </div>
                 <div class="md:col-span-1 bg-white p-6 rounded-lg shadow flex flex-col justify-center">
                     <h3 class="text-lg font-medium mb-1 text-gray-600">ข้อมูลสรุป</h3>
@@ -128,7 +137,6 @@
                             </tr>
                         </thead>
                         <tbody id="reportsTableBody" class="bg-white divide-y divide-gray-200">
-                            <!-- Data will be populated here by JavaScript -->
                             <tr><td colspan="7" class="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
@@ -212,7 +220,7 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjrxHXyE3Ye0qRROD-KICvLzkW7Yka0wswr5AzxnefUw3Dq5_NfPR-Tjd72Z7392Q/exec"; // <<< --- !!! IMPORTANT: REPLACE WITH YOUR ACTUAL SCRIPT URL !!! --- >>>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwZ0I3N7PPjA30HB8qey0LBn0127RqQfv-0B2Flej-WEtzPJwTYQl3TbqkStSrxMTARA/exec"; // <<< --- !!! IMPORTANT: REPLACE WITH YOUR ACTUAL SCRIPT URL !!! --- >>>
         
         let isAdminLoggedIn = false;
         let barChartInstance = null;
@@ -278,7 +286,7 @@
                 showView('dashboard'); 
             }
         });
-        navLogout.addEventListener('click', _logout); // Corrected: No extra ()
+        navLogout.addEventListener('click', _logout);
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
@@ -305,12 +313,7 @@
 
             let url = SCRIPT_URL;
             if (method === 'POST') {
-                if (payload instanceof FormData) { // Should not happen with current implementation
-                    payload.append('action', action);
-                    requestOptions.body = payload;
-                } else {
-                    requestOptions.body = JSON.stringify({ action, ...payload });
-                }
+                requestOptions.body = JSON.stringify({ action, ...payload });
             } else { // GET
                 const queryParams = new URLSearchParams({ action, ...payload });
                 url += `?${queryParams.toString()}`;
@@ -442,7 +445,7 @@
             const chartColors = ['#F59E0B', '#10B981', '#EF4444'];
 
             // Bar Chart
-            const barCtx = document.getElementById('statusBarChart').getContext('2d'); // Corrected ID
+            const barCtx = document.getElementById('statusBarChart').getContext('2d'); 
             if (barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
@@ -458,7 +461,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // <<< JavaScript ที่ปรับปรุง
                     scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
                     plugins: { legend: { display: false } }
                 }
@@ -479,7 +482,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // <<< JavaScript ที่ปรับปรุง
                     plugins: { legend: { position: 'top' } }
                 }
             });
@@ -505,7 +508,7 @@
             const reportId = document.getElementById('reportId').value;
             const action = reportId ? 'updateReport' : 'createReport';
 
-            const formData = new FormData(this); // Still create FormData to easily get values
+            const formData = new FormData(this);
             const fileInput = document.getElementById('certificateFile');
             
             let fileData = {
