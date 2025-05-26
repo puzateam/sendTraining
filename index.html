@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกข้อมูลรายงานผลการเข้ารับการอบรม</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f9fafb; /* Light gray background */
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .header-gradient {
+             background-image: linear-gradient(to right, #EF4444, #F59E0B); /* Red to Yellow */
+             color: white;
+        }
+        .button-theme {
+            background-image: linear-gradient(to right, #DC2626, #D97706); /* Darker Red to Orange for buttons */
+            color: white;
+        }
+        .button-theme:hover {
+            background-image: linear-gradient(to right, #B91C1C, #B45309);
+        }
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .nav-button.active {
+            background-color: #D97706; /* Orange accent for active */
+            color: white;
+        }
+        .nav-button:not(.active) {
+            color: #4B5563; /* Gray for inactive */
+        }
+        .nav-button:not(.active):hover {
+            background-color: #FEF3C7; /* Light yellow hover */
+            color: #D97706;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="header-gradient py-6 shadow-md">
+        <div class="container mx-auto px-4 flex flex-col items-center">
+            <img src="https://i.postimg.cc/d3PbrGqC/logo-School.png" alt="Logo โรงเรียน" style="width: 120px;" class="mb-3">
+            <h1 class="text-2xl font-semibold text-center">บันทึกข้อมูลรายงานผลการเข้ารับการอบรม</h1>
+            <p class="text-lg text-center">โรงเรียนชุมชนบ้านแม่หละป่าป๋วย</p>
+        </div>
+    </header>
+
+    <!-- Navigation Menu -->
+    <nav class="bg-white shadow-sm py-3">
+        <div class="container mx-auto px-4 flex justify-center space-x-2 md:space-x-4">
+            <button id="nav-dashboard" class="nav-button active">แดชบอร์ด</button>
+            <button id="nav-report-form" class="nav-button">รายงานผลการอบรม</button>
+            <button id="nav-admin" class="nav-button">ผู้บริหาร</button>
+            <button id="nav-logout" class="nav-button hidden ml-auto">ออกจากระบบ (ผู้บริหาร)</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Dashboard View -->
+        <div id="dashboard-view">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">ภาพรวมรายงานผลการอบรม</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (จำนวน)</h3>
+                    <canvas id="statusBarChart"></canvas>
+                </div>
+                <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (อัตราส่วน)</h3>
+                    <canvas id="statusPieChart"></canvas>
+                </div>
+                <div class="md:col-span-1 bg-white p-6 rounded-lg shadow flex flex-col justify-center">
+                    <h3 class="text-lg font-medium mb-1 text-gray-600">ข้อมูลสรุป</h3>
+                    <p class="text-gray-500 text-sm">จำนวนรายงานทั้งหมด: <span id="totalReports" class="font-semibold">0</span></p>
+                    <p class="text-gray-500 text-sm">รอพิจารณา: <span id="pendingCount" class="font-semibold">0</span></p>
+                    <p class="text-gray-500 text-sm">อนุมัติ: <span id="approvedCount" class="font-semibold">0</span></p>
+                    <p class="text-gray-500 text-sm">ไม่อนุมัติ: <span id="rejectedCount" class="font-semibold">0</span></p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">รายการรายงานผลการอบรม</h3>
+                <div class="table-responsive">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-สกุล</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หัวข้ออบรม</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานที่</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เกียรติบัตร</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ความเห็นผู้บริหาร</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider admin-actions hidden">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be populated here by JavaScript -->
+                            <tr><td colspan="7" class="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Form Modal -->
+        <div id="report-form-modal" class="modal">
+            <div class="modal-content max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700" id="form-modal-title">บันทึกรายงานผลการอบรม</h2>
+                    <button onclick="closeModal('report-form-modal')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+                <form id="trainingReportForm" class="space-y-4">
+                    <input type="hidden" id="reportId" name="reportId">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-สกุล</label>
+                        <input type="text" id="fullName" name="fullName" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="position" class="block text-sm font-medium text-gray-700 mb-1">ตำแหน่ง</label>
+                        <input type="text" id="position" name="position" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="trainingTopic" class="block text-sm font-medium text-gray-700 mb-1">เรื่องที่อบรม</label>
+                        <input type="text" id="trainingTopic" name="trainingTopic" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="trainingDetails" class="block text-sm font-medium text-gray-700 mb-1">รายละเอียดเนื้อหาการอบรม</label>
+                        <textarea id="trainingDetails" name="trainingDetails" rows="3" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="trainingLocation" class="block text-sm font-medium text-gray-700 mb-1">สถานที่</label>
+                        <input type="text" id="trainingLocation" name="trainingLocation" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="organizer" class="block text-sm font-medium text-gray-700 mb-1">หน่วยงานที่จัด</label>
+                        <input type="text" id="organizer" name="organizer" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="certificateFile" class="block text-sm font-medium text-gray-700 mb-1">แนบเกียรติบัตร (ถ้ามี)</label>
+                        <input type="file" id="certificateFile" name="certificateFile" class="w-full p-2 border border-gray-300 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100">
+                        <span id="currentFileName" class="text-sm text-gray-500 mt-1 block"></span>
+                    </div>
+                    <button type="submit" id="submitReportButton" class="w-full button-theme font-semibold py-3 px-4 rounded-md shadow-sm hover:opacity-90 transition duration-150">
+                        บันทึกข้อมูล
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Login Modal -->
+        <div id="admin-login-modal" class="modal">
+            <div class="modal-content max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700">เข้าสู่ระบบผู้บริหาร</h2>
+                    <button onclick="closeModal('admin-login-modal')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+                <form id="adminLoginForm" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                        <input type="text" id="username" name="username" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+                        <input type="password" id="password" name="password" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <button type="submit" class="w-full button-theme font-semibold py-3 px-4 rounded-md shadow-sm hover:opacity-90 transition duration-150">
+                        เข้าสู่ระบบ
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 py-6 text-center">
+        <p class="text-sm text-gray-600">© 2025 ระบบบันทึกข้อมูลรายงานผลการเข้ารับการอบรม โดย นายสุชาติ เวียงชัย</p>
+    </footer>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwZ0I3N7PPjA30HB8qey0LBn0127RqQfv-0B2Flej-WEtzPJwTYQl3TbqkStSrxMTARA/exec"; // REPLACE WITH YOUR SCRIPT URL
+        
+        let isAdminLoggedIn = false;
+        let barChartInstance = null;
+        let pieChartInstance = null;
+        let allReportsData = []; // Store all fetched reports
+
+        // DOM Elements
+        const navDashboard = document.getElementById('nav-dashboard');
+        const navReportForm = document.getElementById('nav-report-form');
+        const navAdmin = document.getElementById('nav-admin');
+        const navLogout = document.getElementById('nav-logout');
+
+        const dashboardView = document.getElementById('dashboard-view');
+        const reportFormModal = document.getElementById('report-form-modal');
+        const adminLoginModal = document.getElementById('admin-login-modal');
+        
+        const trainingReportForm = document.getElementById('trainingReportForm');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        const reportsTableBody = document.getElementById('reportsTableBody');
+
+        // --- SPA Navigation ---
+        function showView(viewId) {
+            // Hide all views/modals
+            [dashboardView, reportFormModal, adminLoginModal].forEach(el => {
+                if (el.classList.contains('modal')) {
+                    el.style.display = 'none';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+             // Deactivate all nav buttons
+            [navDashboard, navReportForm, navAdmin].forEach(btn => btn.classList.remove('active'));
+
+            // Show the target view and activate corresponding nav button
+            if (viewId === 'dashboard') {
+                dashboardView.style.display = 'block';
+                navDashboard.classList.add('active');
+                loadDashboardData();
+            } else if (viewId === 'report-form') {
+                document.getElementById('form-modal-title').textContent = 'บันทึกรายงานผลการอบรม';
+                document.getElementById('submitReportButton').textContent = 'บันทึกข้อมูล';
+                document.getElementById('currentFileName').textContent = '';
+                trainingReportForm.reset();
+                document.getElementById('reportId').value = ''; // Clear reportId for new entries
+                reportFormModal.style.display = 'flex';
+                 // No nav button activation for modal
+            } else if (viewId === 'admin-login') {
+                adminLoginModal.style.display = 'flex';
+                // No nav button activation for modal
+            }
+        }
+
+        navDashboard.addEventListener('click', () => showView('dashboard'));
+        navReportForm.addEventListener('click', () => {
+            if (isAdminLoggedIn) { // Admin can also submit, but not edit from this button
+                // Reset form for new submission if admin clicks this
+                document.getElementById('form-modal-title').textContent = 'บันทึกรายงานผลการอบรม (Admin)';
+                document.getElementById('submitReportButton').textContent = 'บันทึกข้อมูล';
+                trainingReportForm.reset();
+                document.getElementById('reportId').value = '';
+                document.getElementById('currentFileName').textContent = '';
+            }
+            showView('report-form');
+        });
+        navAdmin.addEventListener('click', () => {
+            if (!isAdminLoggedIn) {
+                showView('admin-login');
+            } else {
+                // If admin is already logged in, clicking "ผู้บริหาร" might just go to dashboard
+                // Or, implement a specific admin dashboard if different from user dashboard.
+                // For now, it does nothing different or could be a "refresh admin view"
+                showView('dashboard'); // Admin sees enhanced dashboard
+            }
+        });
+        navLogout.addEventListener('click', ()_logout);
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // If closing a form modal, usually go back to dashboard view
+            if (modalId === 'report-form-modal' || modalId === 'admin-login-modal') {
+                showView('dashboard');
+            }
+        }
+
+        // --- Data Handling & API Calls ---
+        async function callGoogleScript(action, payload = {}, method = 'POST') {
+            Swal.fire({
+                title: 'กำลังประมวลผล...',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const requestOptions = {
+                method: method,
+                redirect: 'follow', // Important for Apps Script web apps
+            };
+
+            let url = SCRIPT_URL;
+            if (method === 'POST') {
+                 // For POST, we send a FormData object or JSON stringify the payload
+                if (payload instanceof FormData) {
+                    payload.append('action', action);
+                    requestOptions.body = payload;
+                    // Don't set Content-Type for FormData, browser does it.
+                } else {
+                    requestOptions.body = JSON.stringify({ action, ...payload });
+                    // Content-Type will be application/x-www-form-urlencoded if not specified and body is string
+                    // Better to be explicit if GAS expects JSON.
+                    // But GAS doPost often parses e.postData.contents for JSON or e.parameter for form data
+                    // Let's assume GAS handles JSON in postData.contents
+                }
+            } else { // GET
+                const queryParams = new URLSearchParams({ action, ...payload });
+                url += `?${queryParams.toString()}`;
+            }
+            
+            try {
+                const response = await fetch(url, requestOptions);
+                const result = await response.json();
+                Swal.close();
+                return result;
+            } catch (error) {
+                console.error('Error calling Google Script:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: `ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ${error.message}`,
+                });
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function loadDashboardData() {
+            const result = await callGoogleScript('readReports', {}, 'GET');
+            if (result.success && result.data) {
+                allReportsData = result.data; // Store for potential client-side filtering/editing
+                populateTable(result.data);
+                updateCharts(result.data);
+                updateSummaryCounts(result.data);
+            } else {
+                reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-red-500">ไม่สามารถโหลดข้อมูลได้: ${result.error || 'Unknown error'}</td></tr>`;
+            }
+        }
+
+        function populateTable(data) {
+            reportsTableBody.innerHTML = ''; // Clear existing rows
+            if (data.length === 0) {
+                reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-gray-500">ยังไม่มีข้อมูลรายงาน</td></tr>`;
+                return;
+            }
+
+            const statusColors = {
+                "รอพิจารณา": "text-yellow-600 bg-yellow-100",
+                "อนุมัติ": "text-green-600 bg-green-100",
+                "ไม่อนุมัติ": "text-red-600 bg-red-100",
+            };
+
+            data.forEach((row, index) => { // Use original index for actions if IDs are not robust
+                const tr = document.createElement('tr');
+                tr.classList.add(index % 2 === 0 ? 'bg-white' : 'bg-gray-50');
+                
+                let certificateLink = row.certificateUrl ? 
+                    `<a href="${row.certificateUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">ดูไฟล์</a>` : 'ไม่มี';
+                
+                tr.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.fullName || ''}</td>
+                    <td class="px-4 py-3 whitespace-normal text-sm text-gray-700">${row.trainingTopic || ''}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.trainingLocation || ''}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${certificateLink}</td>
+                    <td class="px-4 py-3 whitespace-normal text-sm text-gray-700">${row.adminComment || '-'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[row.status] || 'text-gray-600 bg-gray-100'}">
+                            ${row.status || 'N/A'}
+                        </span>
+                    </td>
+                `;
+
+                if (isAdminLoggedIn) {
+                    const actionsTd = document.createElement('td');
+                    actionsTd.classList.add('px-4', 'py-3', 'whitespace-nowrap', 'text-sm', 'font-medium', 'space-x-1');
+                    
+                    if (row.status === "รอพิจารณา") {
+                        const approveBtn = document.createElement('button');
+                        approveBtn.innerHTML = 'อนุมัติ';
+                        approveBtn.classList.add('text-green-600', 'hover:text-green-900', 'p-1', 'rounded', 'hover:bg-green-100', 'text-xs');
+                        approveBtn.onclick = () => handleAdminAction('approve', row.timestamp, row.trainingTopic); // Use timestamp or unique ID
+                        actionsTd.appendChild(approveBtn);
+
+                        const rejectBtn = document.createElement('button');
+                        rejectBtn.innerHTML = 'ไม่อนุมัติ';
+                        rejectBtn.classList.add('text-red-600', 'hover:text-red-900', 'p-1', 'rounded', 'hover:bg-red-100', 'text-xs');
+                        rejectBtn.onclick = () => handleAdminAction('reject', row.timestamp, row.trainingTopic);
+                        actionsTd.appendChild(rejectBtn);
+                    }
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.innerHTML = 'แก้ไข';
+                    editBtn.classList.add('text-blue-600', 'hover:text-blue-900', 'p-1', 'rounded', 'hover:bg-blue-100', 'text-xs');
+                    editBtn.onclick = () => loadReportForEdit(row.timestamp);
+                    actionsTd.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = 'ลบ';
+                    deleteBtn.classList.add('text-gray-600', 'hover:text-gray-900', 'p-1', 'rounded', 'hover:bg-gray-200', 'text-xs');
+                    deleteBtn.onclick = () => handleAdminAction('delete', row.timestamp, row.trainingTopic);
+                    actionsTd.appendChild(deleteBtn);
+                    
+                    tr.appendChild(actionsTd);
+                }
+                reportsTableBody.appendChild(tr);
+            });
+            toggleAdminActionsVisibility();
+        }
+        
+        function toggleAdminActionsVisibility() {
+            const adminHeaders = document.querySelectorAll('.admin-actions');
+            adminHeaders.forEach(header => {
+                if (isAdminLoggedIn) {
+                    header.classList.remove('hidden');
+                } else {
+                    header.classList.add('hidden');
+                }
+            });
+            // Ensure the colspan of placeholder rows is correct
+            const placeholderRow = reportsTableBody.querySelector('td[colspan]');
+            if(placeholderRow) {
+                placeholderRow.setAttribute('colspan', isAdminLoggedIn ? '7' : '6');
+            }
+        }
+
+        function updateCharts(data) {
+            const statusCounts = { "รอพิจารณา": 0, "อนุมัติ": 0, "ไม่อนุมัติ": 0 };
+            data.forEach(row => {
+                if (statusCounts.hasOwnProperty(row.status)) {
+                    statusCounts[row.status]++;
+                }
+            });
+
+            const chartLabels = Object.keys(statusCounts);
+            const chartData = Object.values(statusCounts);
+            const chartColors = ['#F59E0B', '#10B981', '#EF4444']; // Yellow, Green, Red
+
+            // Bar Chart
+            const barCtx = document.getElementById('statusBaChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'จำนวนรายงาน',
+                        data: chartData,
+                        backgroundColor: chartColors,
+                        borderColor: chartColors.map(color => color + 'B3'), // Add some opacity to border
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Pie Chart
+            const pieCtx = document.getElementById('statusPieChart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: chartColors,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        function updateSummaryCounts(data) {
+            document.getElementById('totalReports').textContent = data.length;
+            const counts = { "รอพิจารณา": 0, "อนุมัติ": 0, "ไม่อนุมัติ": 0 };
+            data.forEach(row => {
+                if (counts.hasOwnProperty(row.status)) {
+                    counts[row.status]++;
+                }
+            });
+            document.getElementById('pendingCount').textContent = counts["รอพิจารณา"];
+            document.getElementById('approvedCount').textContent = counts["อนุมัติ"];
+            document.getElementById('rejectedCount').textContent = counts["ไม่อนุมัติ"];
+        }
+
+
+        // --- Form Submissions ---
+        trainingReportForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const reportId = document.getElementById('reportId').value;
+            const action = reportId ? 'updateReport' : 'createReport';
+
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('certificateFile');
+            
+            // If there's a file, convert to base64 to send as part of JSON
+            // Google Apps Script has trouble with FormData directly from fetch for files in some cases.
+            // Sending as base64 is more reliable for this setup.
+            let fileData = {
+                base64: '',
+                name: '',
+                type: ''
+            };
+
+            if (fileInput.files[0]) {
+                fileData.name = fileInput.files[0].name;
+                fileData.type = fileInput.files[0].type;
+                try {
+                    fileData.base64 = await toBase64(fileInput.files[0]);
+                } catch (error) {
+                    Swal.fire('Error', 'Could not read file.', 'error');
+                    return;
+                }
+            }
+            
+            const payload = {
+                reportId: reportId, // This will be the timestamp for existing reports
+                fullName: formData.get('fullName'),
+                position: formData.get('position'),
+                trainingTopic: formData.get('trainingTopic'),
+                trainingDetails: formData.get('trainingDetails'),
+                trainingLocation: formData.get('trainingLocation'),
+                organizer: formData.get('organizer'),
+                certificateFile: fileData.base64,
+                certificateFileName: fileData.name,
+                certificateMimeType: fileData.type,
+                // status will be set by server for new reports, or maintained for updates unless changed by admin
+            };
+            // If admin is editing, they might also change status/comment, but that's a separate flow.
+            // This form is primarily for user submission or admin full edit.
+
+            const result = await callGoogleScript(action, payload);
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: action === 'createReport' ? 'บันทึกข้อมูลเรียบร้อยแล้ว' : 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                trainingReportForm.reset();
+                document.getElementById('currentFileName').textContent = '';
+                closeModal('report-form-modal');
+                loadDashboardData(); // Refresh dashboard
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: result.error || 'ไม่สามารถบันทึกข้อมูลได้',
+                });
+            }
+        });
+
+        adminLoginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const payload = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+            const result = await callGoogleScript('adminLogin', payload);
+
+            if (result.success) {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('isAdminLoggedInMLPY', 'true'); // Persist login state for session
+                Swal.fire({
+                    icon: 'success',
+                    title: 'เข้าสู่ระบบสำเร็จ',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                adminLoginForm.reset();
+                closeModal('admin-login-modal');
+                navAdmin.textContent = "ผู้บริหาร (ล็อคอินแล้ว)";
+                navLogout.classList.remove('hidden');
+                loadDashboardData(); // Reload to show admin controls
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เข้าสู่ระบบไม่สำเร็จ',
+                    text: result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+                });
+            }
+        });
+
+        function _logout() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem('isAdminLoggedInMLPY');
+            navAdmin.textContent = "ผู้บริหาร";
+            navLogout.classList.add('hidden');
+            Swal.fire({
+                icon: 'info',
+                title: 'ออกจากระบบแล้ว',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            loadDashboardData(); // Reload to hide admin controls
+            showView('dashboard');
+        }
+
+        // --- Admin Actions ---
+        async function handleAdminAction(actionType, reportTimestamp, reportTopic) {
+            let payload = { reportTimestamp: reportTimestamp }; // Use timestamp as ID
+            let confirmText = '';
+            let successText = '';
+
+            if (actionType === 'approve') {
+                confirmText = `คุณต้องการอนุมัติรายงานเรื่อง "${reportTopic}" ใช่หรือไม่?`;
+                successText = 'รายงานได้รับการอนุมัติแล้ว';
+                payload.status = 'อนุมัติ';
+                 const { value: comment } = await Swal.fire({
+                    title: 'อนุมัติรายงาน',
+                    input: 'textarea',
+                    inputLabel: 'ความคิดเห็นเพิ่มเติม (ถ้ามี)',
+                    inputPlaceholder: 'เช่น รับทราบและเห็นควรเผยแพร่...',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันอนุมัติ',
+                    cancelButtonText: 'ยกเลิก',
+                    confirmButtonColor: '#10B981',
+                });
+                if (comment === undefined) return; // User cancelled
+                payload.adminComment = comment || 'รับทราบ';
+            } else if (actionType === 'reject') {
+                confirmText = `คุณต้องการไม่อนุมัติรายงานเรื่อง "${reportTopic}" ใช่หรือไม่?`;
+                successText = 'รายงานไม่ได้รับการอนุมัติ';
+                payload.status = 'ไม่อนุมัติ';
+                const { value: comment } = await Swal.fire({
+                    title: 'ไม่อนุมัติรายงาน',
+                    input: 'textarea',
+                    inputLabel: 'เหตุผล (จำเป็น)',
+                    inputPlaceholder: 'กรุณาระบุเหตุผลที่ไม่อนุมัติ...',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันไม่อนุมัติ',
+                    cancelButtonText: 'ยกเลิก',
+                    confirmButtonColor: '#EF4444',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'กรุณาระบุเหตุผล!'
+                        }
+                    }
+                });
+                if (!comment) return; // User cancelled or entered no reason
+                payload.adminComment = comment;
+            } else if (actionType === 'delete') {
+                confirmText = `คุณต้องการลบรายงานเรื่อง "${reportTopic}" ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้`;
+                successText = 'รายงานถูกลบแล้ว';
+            } else {
+                return; // Unknown action
+            }
+            
+            if (actionType !== 'approve' && actionType !== 'reject') { // For delete, or future actions without pre-comment
+                const confirmed = await Swal.fire({
+                    title: 'ยืนยันการดำเนินการ',
+                    text: confirmText,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444', // Red for delete
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'ยืนยัน',
+                    cancelButtonText: 'ยกเลิก'
+                });
+                if (!confirmed.isConfirmed) return;
+            }
+
+
+            const actionEndpoint = (actionType === 'approve' || actionType === 'reject') ? 'updateReportStatus' : 'deleteReport';
+            const result = await callGoogleScript(actionEndpoint, payload);
+
+            if (result.success) {
+                Swal.fire('สำเร็จ!', successText, 'success');
+                loadDashboardData();
+            } else {
+                Swal.fire('ผิดพลาด!', result.error || 'ไม่สามารถดำเนินการได้', 'error');
+            }
+        }
+        
+        async function loadReportForEdit(reportTimestamp) {
+            // Find the report data from the locally stored allReportsData
+            // This avoids an extra API call if data is already loaded.
+            // Alternatively, fetch specific report: const result = await callGoogleScript('getReportDetails', { reportTimestamp });
+            const reportToEdit = allReportsData.find(report => report.timestamp === reportTimestamp);
+
+            if (reportToEdit) {
+                document.getElementById('form-modal-title').textContent = 'แก้ไขรายงานผลการอบรม';
+                document.getElementById('submitReportButton').textContent = 'บันทึกการแก้ไข';
+                
+                document.getElementById('reportId').value = reportToEdit.timestamp; // Use timestamp as ID
+                document.getElementById('fullName').value = reportToEdit.fullName || '';
+                document.getElementById('position').value = reportToEdit.position || '';
+                document.getElementById('trainingTopic').value = reportToEdit.trainingTopic || '';
+                document.getElementById('trainingDetails').value = reportToEdit.trainingDetails || '';
+                document.getElementById('trainingLocation').value = reportToEdit.trainingLocation || '';
+                document.getElementById('organizer').value = reportToEdit.organizer || '';
+                
+                // Handle certificate file display
+                const currentFileNameSpan = document.getElementById('currentFileName');
+                if (reportToEdit.certificateFileName && reportToEdit.certificateUrl) {
+                    currentFileNameSpan.innerHTML = `ไฟล์ปัจจุบัน: <a href="${reportToEdit.certificateUrl}" target="_blank" class="text-blue-600 hover:underline">${reportToEdit.certificateFileName}</a> (เลือกไฟล์ใหม่เพื่อแทนที่)`;
+                } else {
+                    currentFileNameSpan.textContent = 'ยังไม่มีไฟล์แนบ';
+                }
+                document.getElementById('certificateFile').value = ''; // Clear file input
+
+                reportFormModal.style.display = 'flex';
+            } else {
+                Swal.fire('ผิดพลาด!', 'ไม่พบข้อมูลรายงานที่ต้องการแก้ไข', 'error');
+            }
+        }
+
+        // --- Utility Functions ---
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Get only base64 part
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // --- Initial Load ---
+        function checkLoginState() {
+            if (sessionStorage.getItem('isAdminLoggedInMLPY') === 'true') {
+                isAdminLoggedIn = true;
+                navAdmin.textContent = "ผู้บริหาร (ล็อคอินแล้ว)";
+                navLogout.classList.remove('hidden');
+            }
+        }
+
+        window.onload = () => {
+            checkLoginState();
+            showView('dashboard'); // Default view
+        };
+
+    </script>
+</body>
+</html>
