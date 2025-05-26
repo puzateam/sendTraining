@@ -212,12 +212,12 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/library/d/137B8M72t-rleo7XPLx8O68eKxB1B81wAPgeBfu6B9vUr56GScA02UOkr/4"; // REPLACE WITH YOUR SCRIPT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjrxHXyE3Ye0qRROD-KICvLzkW7Yka0wswr5AzxnefUw3Dq5_NfPR-Tjd72Z7392Q/exec"; // <<< --- !!! IMPORTANT: REPLACE WITH YOUR ACTUAL SCRIPT URL !!! --- >>>
         
         let isAdminLoggedIn = false;
         let barChartInstance = null;
         let pieChartInstance = null;
-        let allReportsData = []; // Store all fetched reports
+        let allReportsData = []; 
 
         // DOM Elements
         const navDashboard = document.getElementById('nav-dashboard');
@@ -235,7 +235,6 @@
 
         // --- SPA Navigation ---
         function showView(viewId) {
-            // Hide all views/modals
             [dashboardView, reportFormModal, adminLoginModal].forEach(el => {
                 if (el.classList.contains('modal')) {
                     el.style.display = 'none';
@@ -243,10 +242,8 @@
                     el.style.display = 'none';
                 }
             });
-             // Deactivate all nav buttons
             [navDashboard, navReportForm, navAdmin].forEach(btn => btn.classList.remove('active'));
 
-            // Show the target view and activate corresponding nav button
             if (viewId === 'dashboard') {
                 dashboardView.style.display = 'block';
                 navDashboard.classList.add('active');
@@ -256,19 +253,16 @@
                 document.getElementById('submitReportButton').textContent = 'บันทึกข้อมูล';
                 document.getElementById('currentFileName').textContent = '';
                 trainingReportForm.reset();
-                document.getElementById('reportId').value = ''; // Clear reportId for new entries
+                document.getElementById('reportId').value = ''; 
                 reportFormModal.style.display = 'flex';
-                 // No nav button activation for modal
             } else if (viewId === 'admin-login') {
                 adminLoginModal.style.display = 'flex';
-                // No nav button activation for modal
             }
         }
 
         navDashboard.addEventListener('click', () => showView('dashboard'));
         navReportForm.addEventListener('click', () => {
-            if (isAdminLoggedIn) { // Admin can also submit, but not edit from this button
-                // Reset form for new submission if admin clicks this
+            if (isAdminLoggedIn) { 
                 document.getElementById('form-modal-title').textContent = 'บันทึกรายงานผลการอบรม (Admin)';
                 document.getElementById('submitReportButton').textContent = 'บันทึกข้อมูล';
                 trainingReportForm.reset();
@@ -281,17 +275,13 @@
             if (!isAdminLoggedIn) {
                 showView('admin-login');
             } else {
-                // If admin is already logged in, clicking "ผู้บริหาร" might just go to dashboard
-                // Or, implement a specific admin dashboard if different from user dashboard.
-                // For now, it does nothing different or could be a "refresh admin view"
-                showView('dashboard'); // Admin sees enhanced dashboard
+                showView('dashboard'); 
             }
         });
-        navLogout.addEventListener('click', ()_logout);
+        navLogout.addEventListener('click', _logout); // Corrected: No extra ()
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            // If closing a form modal, usually go back to dashboard view
             if (modalId === 'report-form-modal' || modalId === 'admin-login-modal') {
                 showView('dashboard');
             }
@@ -310,22 +300,16 @@
 
             const requestOptions = {
                 method: method,
-                redirect: 'follow', // Important for Apps Script web apps
+                redirect: 'follow', 
             };
 
             let url = SCRIPT_URL;
             if (method === 'POST') {
-                 // For POST, we send a FormData object or JSON stringify the payload
-                if (payload instanceof FormData) {
+                if (payload instanceof FormData) { // Should not happen with current implementation
                     payload.append('action', action);
                     requestOptions.body = payload;
-                    // Don't set Content-Type for FormData, browser does it.
                 } else {
                     requestOptions.body = JSON.stringify({ action, ...payload });
-                    // Content-Type will be application/x-www-form-urlencoded if not specified and body is string
-                    // Better to be explicit if GAS expects JSON.
-                    // But GAS doPost often parses e.postData.contents for JSON or e.parameter for form data
-                    // Let's assume GAS handles JSON in postData.contents
                 }
             } else { // GET
                 const queryParams = new URLSearchParams({ action, ...payload });
@@ -351,7 +335,7 @@
         async function loadDashboardData() {
             const result = await callGoogleScript('readReports', {}, 'GET');
             if (result.success && result.data) {
-                allReportsData = result.data; // Store for potential client-side filtering/editing
+                allReportsData = result.data; 
                 populateTable(result.data);
                 updateCharts(result.data);
                 updateSummaryCounts(result.data);
@@ -361,7 +345,7 @@
         }
 
         function populateTable(data) {
-            reportsTableBody.innerHTML = ''; // Clear existing rows
+            reportsTableBody.innerHTML = ''; 
             if (data.length === 0) {
                 reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-gray-500">ยังไม่มีข้อมูลรายงาน</td></tr>`;
                 return;
@@ -373,7 +357,7 @@
                 "ไม่อนุมัติ": "text-red-600 bg-red-100",
             };
 
-            data.forEach((row, index) => { // Use original index for actions if IDs are not robust
+            data.forEach((row, index) => { 
                 const tr = document.createElement('tr');
                 tr.classList.add(index % 2 === 0 ? 'bg-white' : 'bg-gray-50');
                 
@@ -401,7 +385,7 @@
                         const approveBtn = document.createElement('button');
                         approveBtn.innerHTML = 'อนุมัติ';
                         approveBtn.classList.add('text-green-600', 'hover:text-green-900', 'p-1', 'rounded', 'hover:bg-green-100', 'text-xs');
-                        approveBtn.onclick = () => handleAdminAction('approve', row.timestamp, row.trainingTopic); // Use timestamp or unique ID
+                        approveBtn.onclick = () => handleAdminAction('approve', row.timestamp, row.trainingTopic); 
                         actionsTd.appendChild(approveBtn);
 
                         const rejectBtn = document.createElement('button');
@@ -439,7 +423,6 @@
                     header.classList.add('hidden');
                 }
             });
-            // Ensure the colspan of placeholder rows is correct
             const placeholderRow = reportsTableBody.querySelector('td[colspan]');
             if(placeholderRow) {
                 placeholderRow.setAttribute('colspan', isAdminLoggedIn ? '7' : '6');
@@ -456,10 +439,10 @@
 
             const chartLabels = Object.keys(statusCounts);
             const chartData = Object.values(statusCounts);
-            const chartColors = ['#F59E0B', '#10B981', '#EF4444']; // Yellow, Green, Red
+            const chartColors = ['#F59E0B', '#10B981', '#EF4444'];
 
             // Bar Chart
-            const barCtx = document.getElementById('statusBaChart').getContext('2d');
+            const barCtx = document.getElementById('statusBarChart').getContext('2d'); // Corrected ID
             if (barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
@@ -469,7 +452,7 @@
                         label: 'จำนวนรายงาน',
                         data: chartData,
                         backgroundColor: chartColors,
-                        borderColor: chartColors.map(color => color + 'B3'), // Add some opacity to border
+                        borderColor: chartColors.map(color => color + 'B3'), 
                         borderWidth: 1
                     }]
                 },
@@ -522,12 +505,9 @@
             const reportId = document.getElementById('reportId').value;
             const action = reportId ? 'updateReport' : 'createReport';
 
-            const formData = new FormData(this);
+            const formData = new FormData(this); // Still create FormData to easily get values
             const fileInput = document.getElementById('certificateFile');
             
-            // If there's a file, convert to base64 to send as part of JSON
-            // Google Apps Script has trouble with FormData directly from fetch for files in some cases.
-            // Sending as base64 is more reliable for this setup.
             let fileData = {
                 base64: '',
                 name: '',
@@ -546,7 +526,7 @@
             }
             
             const payload = {
-                reportId: reportId, // This will be the timestamp for existing reports
+                reportId: reportId, 
                 fullName: formData.get('fullName'),
                 position: formData.get('position'),
                 trainingTopic: formData.get('trainingTopic'),
@@ -556,10 +536,7 @@
                 certificateFile: fileData.base64,
                 certificateFileName: fileData.name,
                 certificateMimeType: fileData.type,
-                // status will be set by server for new reports, or maintained for updates unless changed by admin
             };
-            // If admin is editing, they might also change status/comment, but that's a separate flow.
-            // This form is primarily for user submission or admin full edit.
 
             const result = await callGoogleScript(action, payload);
 
@@ -573,7 +550,7 @@
                 trainingReportForm.reset();
                 document.getElementById('currentFileName').textContent = '';
                 closeModal('report-form-modal');
-                loadDashboardData(); // Refresh dashboard
+                loadDashboardData(); 
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -594,7 +571,7 @@
 
             if (result.success) {
                 isAdminLoggedIn = true;
-                sessionStorage.setItem('isAdminLoggedInMLPY', 'true'); // Persist login state for session
+                sessionStorage.setItem('isAdminLoggedInMLPY', 'true'); 
                 Swal.fire({
                     icon: 'success',
                     title: 'เข้าสู่ระบบสำเร็จ',
@@ -605,7 +582,7 @@
                 closeModal('admin-login-modal');
                 navAdmin.textContent = "ผู้บริหาร (ล็อคอินแล้ว)";
                 navLogout.classList.remove('hidden');
-                loadDashboardData(); // Reload to show admin controls
+                loadDashboardData(); 
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -626,13 +603,13 @@
                 showConfirmButton: false,
                 timer: 1500
             });
-            loadDashboardData(); // Reload to hide admin controls
+            loadDashboardData(); 
             showView('dashboard');
         }
 
         // --- Admin Actions ---
         async function handleAdminAction(actionType, reportTimestamp, reportTopic) {
-            let payload = { reportTimestamp: reportTimestamp }; // Use timestamp as ID
+            let payload = { reportTimestamp: reportTimestamp }; 
             let confirmText = '';
             let successText = '';
 
@@ -650,7 +627,7 @@
                     cancelButtonText: 'ยกเลิก',
                     confirmButtonColor: '#10B981',
                 });
-                if (comment === undefined) return; // User cancelled
+                if (comment === undefined) return; 
                 payload.adminComment = comment || 'รับทราบ';
             } else if (actionType === 'reject') {
                 confirmText = `คุณต้องการไม่อนุมัติรายงานเรื่อง "${reportTopic}" ใช่หรือไม่?`;
@@ -671,29 +648,28 @@
                         }
                     }
                 });
-                if (!comment) return; // User cancelled or entered no reason
+                if (!comment) return; 
                 payload.adminComment = comment;
             } else if (actionType === 'delete') {
                 confirmText = `คุณต้องการลบรายงานเรื่อง "${reportTopic}" ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้`;
                 successText = 'รายงานถูกลบแล้ว';
             } else {
-                return; // Unknown action
+                return; 
             }
             
-            if (actionType !== 'approve' && actionType !== 'reject') { // For delete, or future actions without pre-comment
+            if (actionType !== 'approve' && actionType !== 'reject') { 
                 const confirmed = await Swal.fire({
                     title: 'ยืนยันการดำเนินการ',
                     text: confirmText,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#EF4444', // Red for delete
+                    confirmButtonColor: '#EF4444', 
                     cancelButtonColor: '#6B7280',
                     confirmButtonText: 'ยืนยัน',
                     cancelButtonText: 'ยกเลิก'
                 });
                 if (!confirmed.isConfirmed) return;
             }
-
 
             const actionEndpoint = (actionType === 'approve' || actionType === 'reject') ? 'updateReportStatus' : 'deleteReport';
             const result = await callGoogleScript(actionEndpoint, payload);
@@ -707,16 +683,13 @@
         }
         
         async function loadReportForEdit(reportTimestamp) {
-            // Find the report data from the locally stored allReportsData
-            // This avoids an extra API call if data is already loaded.
-            // Alternatively, fetch specific report: const result = await callGoogleScript('getReportDetails', { reportTimestamp });
             const reportToEdit = allReportsData.find(report => report.timestamp === reportTimestamp);
 
             if (reportToEdit) {
                 document.getElementById('form-modal-title').textContent = 'แก้ไขรายงานผลการอบรม';
                 document.getElementById('submitReportButton').textContent = 'บันทึกการแก้ไข';
                 
-                document.getElementById('reportId').value = reportToEdit.timestamp; // Use timestamp as ID
+                document.getElementById('reportId').value = reportToEdit.timestamp; 
                 document.getElementById('fullName').value = reportToEdit.fullName || '';
                 document.getElementById('position').value = reportToEdit.position || '';
                 document.getElementById('trainingTopic').value = reportToEdit.trainingTopic || '';
@@ -724,14 +697,13 @@
                 document.getElementById('trainingLocation').value = reportToEdit.trainingLocation || '';
                 document.getElementById('organizer').value = reportToEdit.organizer || '';
                 
-                // Handle certificate file display
                 const currentFileNameSpan = document.getElementById('currentFileName');
                 if (reportToEdit.certificateFileName && reportToEdit.certificateUrl) {
                     currentFileNameSpan.innerHTML = `ไฟล์ปัจจุบัน: <a href="${reportToEdit.certificateUrl}" target="_blank" class="text-blue-600 hover:underline">${reportToEdit.certificateFileName}</a> (เลือกไฟล์ใหม่เพื่อแทนที่)`;
                 } else {
                     currentFileNameSpan.textContent = 'ยังไม่มีไฟล์แนบ';
                 }
-                document.getElementById('certificateFile').value = ''; // Clear file input
+                document.getElementById('certificateFile').value = '';
 
                 reportFormModal.style.display = 'flex';
             } else {
@@ -744,7 +716,7 @@
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]); // Get only base64 part
+                reader.onload = () => resolve(reader.result.split(',')[1]); 
                 reader.onerror = error => reject(error);
             });
         }
@@ -760,7 +732,7 @@
 
         window.onload = () => {
             checkLoginState();
-            showView('dashboard'); // Default view
+            showView('dashboard'); 
         };
 
     </script>
