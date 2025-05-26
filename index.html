@@ -11,10 +11,10 @@
     <style>
         body {
             font-family: 'Prompt', sans-serif;
-            background-color: #f9fafb; /* Light gray background */
+            background-color: #f9fafb;
         }
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -39,11 +39,11 @@
             overflow-x: auto;
         }
         .header-gradient {
-             background-image: linear-gradient(to right, #EF4444, #F59E0B); /* Red to Yellow */
+             background-image: linear-gradient(to right, #EF4444, #F59E0B);
              color: white;
         }
         .button-theme {
-            background-image: linear-gradient(to right, #DC2626, #D97706); /* Darker Red to Orange for buttons */
+            background-image: linear-gradient(to right, #DC2626, #D97706);
             color: white;
         }
         .button-theme:hover {
@@ -56,26 +56,25 @@
             transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
         }
         .nav-button.active {
-            background-color: #D97706; /* Orange accent for active */
+            background-color: #D97706;
             color: white;
         }
         .nav-button:not(.active) {
-            color: #4B5563; /* Gray for inactive */
+            color: #4B5563;
         }
         .nav-button:not(.active):hover {
-            background-color: #FEF3C7; /* Light yellow hover */
+            background-color: #FEF3C7;
             color: #D97706;
         }
-        .chart-container { /* <<< CSS ใหม่สำหรับ container ของกราฟ */
+        .chart-container {
             position: relative; 
-            height: 250px;  /* คุณสามารถปรับความสูงนี้ได้ */
+            height: 250px;
             width: 100%;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Header -->
     <header class="header-gradient py-6 shadow-md">
         <div class="container mx-auto px-4 flex flex-col items-center">
             <img src="https://i.postimg.cc/d3PbrGqC/logo-School.png" alt="Logo โรงเรียน" style="width: 120px;" class="mb-3">
@@ -84,7 +83,6 @@
         </div>
     </header>
 
-    <!-- Navigation Menu -->
     <nav class="bg-white shadow-sm py-3">
         <div class="container mx-auto px-4 flex justify-center space-x-2 md:space-x-4">
             <button id="nav-dashboard" class="nav-button active">แดชบอร์ด</button>
@@ -94,21 +92,19 @@
         </div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- Dashboard View -->
         <div id="dashboard-view">
             <h2 class="text-2xl font-semibold mb-6 text-gray-700">ภาพรวมรายงานผลการอบรม</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (จำนวน)</h3>
-                    <div class="chart-container"> 
+                    <div class="chart-container">
                         <canvas id="statusBarChart"></canvas>
                     </div>
                 </div>
                 <div class="md:col-span-1 bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-medium mb-3 text-gray-600">สถานะการรายงาน (อัตราส่วน)</h3>
-                    <div class="chart-container"> 
+                    <div class="chart-container">
                         <canvas id="statusPieChart"></canvas>
                     </div>
                 </div>
@@ -144,7 +140,6 @@
             </div>
         </div>
 
-        <!-- Report Form Modal -->
         <div id="report-form-modal" class="modal">
             <div class="modal-content max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-6">
@@ -189,7 +184,6 @@
             </div>
         </div>
 
-        <!-- Admin Login Modal -->
         <div id="admin-login-modal" class="modal">
             <div class="modal-content max-w-md">
                 <div class="flex justify-between items-center mb-6">
@@ -199,11 +193,11 @@
                 <form id="adminLoginForm" class="space-y-4">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
-                        <input type="text" id="username" name="username" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                        <input type="text" id="username" name="username" value="mlpyboss" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
-                        <input type="password" id="password" name="password" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                        <input type="password" id="password" name="password" value="06052520" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
                     </div>
                     <button type="submit" class="w-full button-theme font-semibold py-3 px-4 rounded-md shadow-sm hover:opacity-90 transition duration-150">
                         เข้าสู่ระบบ
@@ -211,44 +205,35 @@
                 </form>
             </div>
         </div>
-
     </main>
 
-    <!-- Footer -->
     <footer class="bg-gray-200 py-6 text-center">
         <p class="text-sm text-gray-600">© 2025 ระบบบันทึกข้อมูลรายงานผลการเข้ารับการอบรม โดย นายสุชาติ เวียงชัย</p>
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwZ0I3N7PPjA30HB8qey0LBn0127RqQfv-0B2Flej-WEtzPJwTYQl3TbqkStSrxMTARA/exec"; // <<< --- !!! IMPORTANT: REPLACE WITH YOUR ACTUAL SCRIPT URL !!! --- >>>
+        const SCRIPT_URL = "ใส่_WEB_APP_URL_ของคุณตรงนี้"; // <<< --- !!! สำคัญ: แก้ไข URL นี้ !!! --- >>>
         
         let isAdminLoggedIn = false;
         let barChartInstance = null;
         let pieChartInstance = null;
         let allReportsData = []; 
 
-        // DOM Elements
         const navDashboard = document.getElementById('nav-dashboard');
         const navReportForm = document.getElementById('nav-report-form');
         const navAdmin = document.getElementById('nav-admin');
         const navLogout = document.getElementById('nav-logout');
-
         const dashboardView = document.getElementById('dashboard-view');
         const reportFormModal = document.getElementById('report-form-modal');
         const adminLoginModal = document.getElementById('admin-login-modal');
-        
         const trainingReportForm = document.getElementById('trainingReportForm');
         const adminLoginForm = document.getElementById('adminLoginForm');
         const reportsTableBody = document.getElementById('reportsTableBody');
 
-        // --- SPA Navigation ---
         function showView(viewId) {
             [dashboardView, reportFormModal, adminLoginModal].forEach(el => {
-                if (el.classList.contains('modal')) {
-                    el.style.display = 'none';
-                } else {
-                    el.style.display = 'none';
-                }
+                if (el.classList.contains('modal')) el.style.display = 'none';
+                else el.style.display = 'none';
             });
             [navDashboard, navReportForm, navAdmin].forEach(btn => btn.classList.remove('active'));
 
@@ -280,11 +265,8 @@
             showView('report-form');
         });
         navAdmin.addEventListener('click', () => {
-            if (!isAdminLoggedIn) {
-                showView('admin-login');
-            } else {
-                showView('dashboard'); 
-            }
+            if (!isAdminLoggedIn) showView('admin-login');
+            else showView('dashboard'); 
         });
         navLogout.addEventListener('click', _logout);
 
@@ -295,61 +277,69 @@
             }
         }
 
-        // --- Data Handling & API Calls ---
         async function callGoogleScript(action, payload = {}, method = 'POST') {
             Swal.fire({
                 title: 'กำลังประมวลผล...',
                 text: 'กรุณารอสักครู่',
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => Swal.showLoading()
             });
 
-            const requestOptions = {
-                method: method,
-                redirect: 'follow', 
-            };
-
+            const requestOptions = { method: method, redirect: 'follow' };
             let url = SCRIPT_URL;
+
             if (method === 'POST') {
                 requestOptions.body = JSON.stringify({ action, ...payload });
-            } else { // GET
+            } else { 
                 const queryParams = new URLSearchParams({ action, ...payload });
                 url += `?${queryParams.toString()}`;
             }
             
             try {
                 const response = await fetch(url, requestOptions);
+                if (!response.ok) { // Check for non-2xx responses
+                    const errorText = await response.text();
+                    throw new Error(`Server error: ${response.status} ${response.statusText}. Details: ${errorText}`);
+                }
                 const result = await response.json();
                 Swal.close();
                 return result;
             } catch (error) {
-                console.error('Error calling Google Script:', error);
+                console.error('Error calling Google Script:', action, error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: `ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้: ${error.message}`,
+                    title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+                    text: `ไม่สามารถสื่อสารกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง (${error.message})`,
                 });
                 return { success: false, error: error.message };
             }
         }
         
         async function loadDashboardData() {
+            reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>`;
             const result = await callGoogleScript('readReports', {}, 'GET');
+            // console.log("Data received from readReports:", JSON.stringify(result, null, 2)); // DEBUG: Log detailed data
+
             if (result.success && result.data) {
                 allReportsData = result.data; 
                 populateTable(result.data);
                 updateCharts(result.data);
                 updateSummaryCounts(result.data);
             } else {
-                reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-red-500">ไม่สามารถโหลดข้อมูลได้: ${result.error || 'Unknown error'}</td></tr>`;
+                console.error("Failed to load data or data is empty:", result.error || "No data returned");
+                reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-red-500">ไม่สามารถโหลดข้อมูลได้: ${result.error || 'ไม่มีข้อมูล'}</td></tr>`;
+                 // Clear charts if no data
+                if(barChartInstance) barChartInstance.destroy();
+                if(pieChartInstance) pieChartInstance.destroy();
+                updateSummaryCounts([]); // Clear summary
             }
         }
 
         function populateTable(data) {
             reportsTableBody.innerHTML = ''; 
-            if (data.length === 0) {
+            // console.log("Data for table population:", data); // DEBUG
+
+            if (!data || data.length === 0) {
                 reportsTableBody.innerHTML = `<tr><td colspan="${isAdminLoggedIn ? 7 : 6}" class="text-center py-4 text-gray-500">ยังไม่มีข้อมูลรายงาน</td></tr>`;
                 return;
             }
@@ -367,10 +357,11 @@
                 let certificateLink = row.certificateUrl ? 
                     `<a href="${row.certificateUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">ดูไฟล์</a>` : 'ไม่มี';
                 
+                // Ensure all expected properties exist on 'row' or provide defaults
                 tr.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.fullName || ''}</td>
-                    <td class="px-4 py-3 whitespace-normal text-sm text-gray-700">${row.trainingTopic || ''}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.trainingLocation || ''}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.fullName || 'N/A'}</td>
+                    <td class="px-4 py-3 whitespace-normal text-sm text-gray-700">${row.trainingTopic || 'N/A'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.trainingLocation || 'N/A'}</td>
                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${certificateLink}</td>
                     <td class="px-4 py-3 whitespace-normal text-sm text-gray-700">${row.adminComment || '-'}</td>
                     <td class="px-4 py-3 whitespace-nowrap text-sm">
@@ -383,33 +374,28 @@
                 if (isAdminLoggedIn) {
                     const actionsTd = document.createElement('td');
                     actionsTd.classList.add('px-4', 'py-3', 'whitespace-nowrap', 'text-sm', 'font-medium', 'space-x-1');
-                    
                     if (row.status === "รอพิจารณา") {
                         const approveBtn = document.createElement('button');
                         approveBtn.innerHTML = 'อนุมัติ';
                         approveBtn.classList.add('text-green-600', 'hover:text-green-900', 'p-1', 'rounded', 'hover:bg-green-100', 'text-xs');
                         approveBtn.onclick = () => handleAdminAction('approve', row.timestamp, row.trainingTopic); 
                         actionsTd.appendChild(approveBtn);
-
                         const rejectBtn = document.createElement('button');
                         rejectBtn.innerHTML = 'ไม่อนุมัติ';
                         rejectBtn.classList.add('text-red-600', 'hover:text-red-900', 'p-1', 'rounded', 'hover:bg-red-100', 'text-xs');
                         rejectBtn.onclick = () => handleAdminAction('reject', row.timestamp, row.trainingTopic);
                         actionsTd.appendChild(rejectBtn);
                     }
-                    
                     const editBtn = document.createElement('button');
                     editBtn.innerHTML = 'แก้ไข';
                     editBtn.classList.add('text-blue-600', 'hover:text-blue-900', 'p-1', 'rounded', 'hover:bg-blue-100', 'text-xs');
                     editBtn.onclick = () => loadReportForEdit(row.timestamp);
                     actionsTd.appendChild(editBtn);
-
                     const deleteBtn = document.createElement('button');
                     deleteBtn.innerHTML = 'ลบ';
                     deleteBtn.classList.add('text-gray-600', 'hover:text-gray-900', 'p-1', 'rounded', 'hover:bg-gray-200', 'text-xs');
                     deleteBtn.onclick = () => handleAdminAction('delete', row.timestamp, row.trainingTopic);
                     actionsTd.appendChild(deleteBtn);
-                    
                     tr.appendChild(actionsTd);
                 }
                 reportsTableBody.appendChild(tr);
@@ -420,178 +406,101 @@
         function toggleAdminActionsVisibility() {
             const adminHeaders = document.querySelectorAll('.admin-actions');
             adminHeaders.forEach(header => {
-                if (isAdminLoggedIn) {
-                    header.classList.remove('hidden');
-                } else {
-                    header.classList.add('hidden');
-                }
+                if (isAdminLoggedIn) header.classList.remove('hidden');
+                else header.classList.add('hidden');
             });
             const placeholderRow = reportsTableBody.querySelector('td[colspan]');
-            if(placeholderRow) {
-                placeholderRow.setAttribute('colspan', isAdminLoggedIn ? '7' : '6');
-            }
+            if(placeholderRow) placeholderRow.setAttribute('colspan', isAdminLoggedIn ? '7' : '6');
         }
 
         function updateCharts(data) {
             const statusCounts = { "รอพิจารณา": 0, "อนุมัติ": 0, "ไม่อนุมัติ": 0 };
-            data.forEach(row => {
-                if (statusCounts.hasOwnProperty(row.status)) {
-                    statusCounts[row.status]++;
-                }
+            (data || []).forEach(row => { // Add guard for data
+                if (statusCounts.hasOwnProperty(row.status)) statusCounts[row.status]++;
             });
 
             const chartLabels = Object.keys(statusCounts);
-            const chartData = Object.values(statusCounts);
+            const chartDataValues = Object.values(statusCounts);
             const chartColors = ['#F59E0B', '#10B981', '#EF4444'];
 
-            // Bar Chart
             const barCtx = document.getElementById('statusBarChart').getContext('2d'); 
             if (barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'จำนวนรายงาน',
-                        data: chartData,
-                        backgroundColor: chartColors,
-                        borderColor: chartColors.map(color => color + 'B3'), 
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // <<< JavaScript ที่ปรับปรุง
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: chartLabels, datasets: [{ label: 'จำนวนรายงาน', data: chartDataValues, backgroundColor: chartColors, borderColor: chartColors.map(c => c + 'B3'), borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
             });
 
-            // Pie Chart
             const pieCtx = document.getElementById('statusPieChart').getContext('2d');
             if (pieChartInstance) pieChartInstance.destroy();
             pieChartInstance = new Chart(pieCtx, {
                 type: 'pie',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        data: chartData,
-                        backgroundColor: chartColors,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // <<< JavaScript ที่ปรับปรุง
-                    plugins: { legend: { position: 'top' } }
-                }
+                data: { labels: chartLabels, datasets: [{ data: chartDataValues, backgroundColor: chartColors, hoverOffset: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
             });
         }
 
         function updateSummaryCounts(data) {
-            document.getElementById('totalReports').textContent = data.length;
+            document.getElementById('totalReports').textContent = (data || []).length; // Add guard for data
             const counts = { "รอพิจารณา": 0, "อนุมัติ": 0, "ไม่อนุมัติ": 0 };
-            data.forEach(row => {
-                if (counts.hasOwnProperty(row.status)) {
-                    counts[row.status]++;
-                }
+            (data || []).forEach(row => {
+                if (counts.hasOwnProperty(row.status)) counts[row.status]++;
             });
             document.getElementById('pendingCount').textContent = counts["รอพิจารณา"];
             document.getElementById('approvedCount').textContent = counts["อนุมัติ"];
             document.getElementById('rejectedCount').textContent = counts["ไม่อนุมัติ"];
         }
 
-
-        // --- Form Submissions ---
         trainingReportForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const reportId = document.getElementById('reportId').value;
             const action = reportId ? 'updateReport' : 'createReport';
-
             const formData = new FormData(this);
             const fileInput = document.getElementById('certificateFile');
-            
-            let fileData = {
-                base64: '',
-                name: '',
-                type: ''
-            };
+            let fileData = { base64: '', name: '', type: '' };
 
             if (fileInput.files[0]) {
                 fileData.name = fileInput.files[0].name;
                 fileData.type = fileInput.files[0].type;
-                try {
-                    fileData.base64 = await toBase64(fileInput.files[0]);
-                } catch (error) {
-                    Swal.fire('Error', 'Could not read file.', 'error');
-                    return;
-                }
+                try { fileData.base64 = await toBase64(fileInput.files[0]); } 
+                catch (error) { Swal.fire('Error', 'Could not read file.', 'error'); return; }
             }
             
             const payload = {
                 reportId: reportId, 
-                fullName: formData.get('fullName'),
-                position: formData.get('position'),
-                trainingTopic: formData.get('trainingTopic'),
-                trainingDetails: formData.get('trainingDetails'),
-                trainingLocation: formData.get('trainingLocation'),
-                organizer: formData.get('organizer'),
-                certificateFile: fileData.base64,
-                certificateFileName: fileData.name,
-                certificateMimeType: fileData.type,
+                fullName: formData.get('fullName'), position: formData.get('position'),
+                trainingTopic: formData.get('trainingTopic'), trainingDetails: formData.get('trainingDetails'),
+                trainingLocation: formData.get('trainingLocation'), organizer: formData.get('organizer'),
+                certificateFile: fileData.base64, certificateFileName: fileData.name, certificateMimeType: fileData.type,
             };
-
             const result = await callGoogleScript(action, payload);
-
             if (result.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: action === 'createReport' ? 'บันทึกข้อมูลเรียบร้อยแล้ว' : 'แก้ไขข้อมูลเรียบร้อยแล้ว',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                Swal.fire({ icon: 'success', title: action === 'createReport' ? 'บันทึกข้อมูลเรียบร้อยแล้ว' : 'แก้ไขข้อมูลเรียบร้อยแล้ว', showConfirmButton: false, timer: 1500 });
                 trainingReportForm.reset();
                 document.getElementById('currentFileName').textContent = '';
                 closeModal('report-form-modal');
                 loadDashboardData(); 
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: result.error || 'ไม่สามารถบันทึกข้อมูลได้',
-                });
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: result.error || 'ไม่สามารถบันทึกข้อมูลได้' });
             }
         });
 
         adminLoginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            const payload = {
-                username: formData.get('username'),
-                password: formData.get('password')
-            };
+            const payload = { username: formData.get('username'), password: formData.get('password') };
             const result = await callGoogleScript('adminLogin', payload);
-
             if (result.success) {
                 isAdminLoggedIn = true;
                 sessionStorage.setItem('isAdminLoggedInMLPY', 'true'); 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'เข้าสู่ระบบสำเร็จ',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ', showConfirmButton: false, timer: 1500 });
                 adminLoginForm.reset();
                 closeModal('admin-login-modal');
                 navAdmin.textContent = "ผู้บริหาร (ล็อคอินแล้ว)";
                 navLogout.classList.remove('hidden');
                 loadDashboardData(); 
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เข้าสู่ระบบไม่สำเร็จ',
-                    text: result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
-                });
+                Swal.fire({ icon: 'error', title: 'เข้าสู่ระบบไม่สำเร็จ', text: result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
             }
         });
 
@@ -600,76 +509,55 @@
             sessionStorage.removeItem('isAdminLoggedInMLPY');
             navAdmin.textContent = "ผู้บริหาร";
             navLogout.classList.add('hidden');
-            Swal.fire({
-                icon: 'info',
-                title: 'ออกจากระบบแล้ว',
-                showConfirmButton: false,
-                timer: 1500
-            });
+            Swal.fire({ icon: 'info', title: 'ออกจากระบบแล้ว', showConfirmButton: false, timer: 1500 });
             loadDashboardData(); 
             showView('dashboard');
         }
 
-        // --- Admin Actions ---
         async function handleAdminAction(actionType, reportTimestamp, reportTopic) {
             let payload = { reportTimestamp: reportTimestamp }; 
-            let confirmText = '';
-            let successText = '';
+            let confirmText = '', successText = '';
+            let preConfirmAction = null;
 
             if (actionType === 'approve') {
-                confirmText = `คุณต้องการอนุมัติรายงานเรื่อง "${reportTopic}" ใช่หรือไม่?`;
-                successText = 'รายงานได้รับการอนุมัติแล้ว';
-                payload.status = 'อนุมัติ';
-                 const { value: comment } = await Swal.fire({
-                    title: 'อนุมัติรายงาน',
-                    input: 'textarea',
-                    inputLabel: 'ความคิดเห็นเพิ่มเติม (ถ้ามี)',
-                    inputPlaceholder: 'เช่น รับทราบและเห็นควรเผยแพร่...',
-                    showCancelButton: true,
-                    confirmButtonText: 'ยืนยันอนุมัติ',
-                    cancelButtonText: 'ยกเลิก',
-                    confirmButtonColor: '#10B981',
-                });
-                if (comment === undefined) return; 
-                payload.adminComment = comment || 'รับทราบ';
+                preConfirmAction = async () => {
+                    const { value: comment } = await Swal.fire({
+                        title: 'อนุมัติรายงาน', input: 'textarea', inputLabel: 'ความคิดเห็นเพิ่มเติม (ถ้ามี)',
+                        inputPlaceholder: 'เช่น รับทราบและเห็นควรเผยแพร่...', showCancelButton: true,
+                        confirmButtonText: 'ยืนยันอนุมัติ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#10B981',
+                    });
+                    if (comment === undefined) return false; // User cancelled
+                    payload.adminComment = comment || 'รับทราบ';
+                    payload.status = 'อนุมัติ';
+                    successText = 'รายงานได้รับการอนุมัติแล้ว';
+                    return true;
+                };
             } else if (actionType === 'reject') {
-                confirmText = `คุณต้องการไม่อนุมัติรายงานเรื่อง "${reportTopic}" ใช่หรือไม่?`;
-                successText = 'รายงานไม่ได้รับการอนุมัติ';
-                payload.status = 'ไม่อนุมัติ';
-                const { value: comment } = await Swal.fire({
-                    title: 'ไม่อนุมัติรายงาน',
-                    input: 'textarea',
-                    inputLabel: 'เหตุผล (จำเป็น)',
-                    inputPlaceholder: 'กรุณาระบุเหตุผลที่ไม่อนุมัติ...',
-                    showCancelButton: true,
-                    confirmButtonText: 'ยืนยันไม่อนุมัติ',
-                    cancelButtonText: 'ยกเลิก',
-                    confirmButtonColor: '#EF4444',
-                    inputValidator: (value) => {
-                        if (!value) {
-                            return 'กรุณาระบุเหตุผล!'
-                        }
-                    }
-                });
-                if (!comment) return; 
-                payload.adminComment = comment;
+                 preConfirmAction = async () => {
+                    const { value: comment } = await Swal.fire({
+                        title: 'ไม่อนุมัติรายงาน', input: 'textarea', inputLabel: 'เหตุผล (จำเป็น)',
+                        inputPlaceholder: 'กรุณาระบุเหตุผลที่ไม่อนุมัติ...', showCancelButton: true,
+                        confirmButtonText: 'ยืนยันไม่อนุมัติ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#EF4444',
+                        inputValidator: (value) => !value && 'กรุณาระบุเหตุผล!'
+                    });
+                    if (!comment) return false; // User cancelled or no reason
+                    payload.adminComment = comment;
+                    payload.status = 'ไม่อนุมัติ';
+                    successText = 'รายงานไม่ได้รับการอนุมัติ';
+                    return true;
+                 };
             } else if (actionType === 'delete') {
                 confirmText = `คุณต้องการลบรายงานเรื่อง "${reportTopic}" ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้`;
                 successText = 'รายงานถูกลบแล้ว';
-            } else {
-                return; 
-            }
+            } else return;
             
-            if (actionType !== 'approve' && actionType !== 'reject') { 
-                const confirmed = await Swal.fire({
-                    title: 'ยืนยันการดำเนินการ',
-                    text: confirmText,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#EF4444', 
-                    cancelButtonColor: '#6B7280',
-                    confirmButtonText: 'ยืนยัน',
-                    cancelButtonText: 'ยกเลิก'
+            if (preConfirmAction) {
+                if (!await preConfirmAction()) return; // Execute pre-confirmation and exit if it fails/cancels
+            } else { // For actions like delete that don't have a pre-input Swal
+                 const confirmed = await Swal.fire({
+                    title: 'ยืนยันการดำเนินการ', text: confirmText, icon: 'warning', showCancelButton: true,
+                    confirmButtonColor: '#EF4444', cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก'
                 });
                 if (!confirmed.isConfirmed) return;
             }
@@ -677,21 +565,16 @@
             const actionEndpoint = (actionType === 'approve' || actionType === 'reject') ? 'updateReportStatus' : 'deleteReport';
             const result = await callGoogleScript(actionEndpoint, payload);
 
-            if (result.success) {
-                Swal.fire('สำเร็จ!', successText, 'success');
-                loadDashboardData();
-            } else {
-                Swal.fire('ผิดพลาด!', result.error || 'ไม่สามารถดำเนินการได้', 'error');
-            }
+            if (result.success) Swal.fire('สำเร็จ!', successText, 'success');
+            else Swal.fire('ผิดพลาด!', result.error || 'ไม่สามารถดำเนินการได้', 'error');
+            loadDashboardData();
         }
         
         async function loadReportForEdit(reportTimestamp) {
             const reportToEdit = allReportsData.find(report => report.timestamp === reportTimestamp);
-
             if (reportToEdit) {
                 document.getElementById('form-modal-title').textContent = 'แก้ไขรายงานผลการอบรม';
                 document.getElementById('submitReportButton').textContent = 'บันทึกการแก้ไข';
-                
                 document.getElementById('reportId').value = reportToEdit.timestamp; 
                 document.getElementById('fullName').value = reportToEdit.fullName || '';
                 document.getElementById('position').value = reportToEdit.position || '';
@@ -699,22 +582,17 @@
                 document.getElementById('trainingDetails').value = reportToEdit.trainingDetails || '';
                 document.getElementById('trainingLocation').value = reportToEdit.trainingLocation || '';
                 document.getElementById('organizer').value = reportToEdit.organizer || '';
-                
                 const currentFileNameSpan = document.getElementById('currentFileName');
-                if (reportToEdit.certificateFileName && reportToEdit.certificateUrl) {
-                    currentFileNameSpan.innerHTML = `ไฟล์ปัจจุบัน: <a href="${reportToEdit.certificateUrl}" target="_blank" class="text-blue-600 hover:underline">${reportToEdit.certificateFileName}</a> (เลือกไฟล์ใหม่เพื่อแทนที่)`;
-                } else {
-                    currentFileNameSpan.textContent = 'ยังไม่มีไฟล์แนบ';
-                }
+                currentFileNameSpan.innerHTML = (reportToEdit.certificateFileName && reportToEdit.certificateUrl) ?
+                    `ไฟล์ปัจจุบัน: <a href="${reportToEdit.certificateUrl}" target="_blank" class="text-blue-600 hover:underline">${reportToEdit.certificateFileName}</a> (เลือกไฟล์ใหม่เพื่อแทนที่)` :
+                    'ยังไม่มีไฟล์แนบ';
                 document.getElementById('certificateFile').value = '';
-
                 reportFormModal.style.display = 'flex';
             } else {
                 Swal.fire('ผิดพลาด!', 'ไม่พบข้อมูลรายงานที่ต้องการแก้ไข', 'error');
             }
         }
 
-        // --- Utility Functions ---
         function toBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -724,7 +602,6 @@
             });
         }
 
-        // --- Initial Load ---
         function checkLoginState() {
             if (sessionStorage.getItem('isAdminLoggedInMLPY') === 'true') {
                 isAdminLoggedIn = true;
@@ -737,7 +614,6 @@
             checkLoginState();
             showView('dashboard'); 
         };
-
     </script>
 </body>
 </html>
